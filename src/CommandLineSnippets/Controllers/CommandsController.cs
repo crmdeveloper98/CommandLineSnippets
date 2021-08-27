@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using CommandLineSnippets.Data;
+using CommandLineSnippets.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CommandLineSnippets.Controllers
@@ -7,12 +9,30 @@ namespace CommandLineSnippets.Controllers
     [ApiController]
     public class CommandsController : ControllerBase
     {
+        private readonly ICommandRepository _repository;
 
-        [HttpGet]
-        public ActionResult<IEnumerable<string>> Get()
+        public CommandsController(ICommandRepository repository)
         {
-            return new string[] {"this", "is", "hard", "coded"};
+            _repository = repository;
+        }     
+
+        [HttpGet]   
+        public ActionResult<IEnumerable<Command>> GetAllCommands()
+        {
+            var commandItems = _repository.GetAllCommands();
+            return Ok(commandItems);
         }
-        
+
+        [HttpGet("{id:int}")]
+        public ActionResult<Command> GetCommandById(int id)
+        {
+            var commandItem = _repository.GetCommandById(id);
+            if (commandItem == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(commandItem);
+        }        
     }
 }
