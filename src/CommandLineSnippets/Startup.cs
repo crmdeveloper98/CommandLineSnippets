@@ -6,6 +6,7 @@ using CommandLineSnippets.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,8 +25,13 @@ namespace CommandLineSnippets
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            var builder = new SqlConnectionStringBuilder();
+            builder.ConnectionString = Configuration.GetConnectionString("AppDbConnection");
+            builder.UserID = Configuration["UserID"];
+            builder.Password = Configuration["Password"];
+            
             services.AddDbContext<AppDbContext>(options => 
-                options.UseSqlServer(Configuration.GetConnectionString("AppDbConnection")));
+                options.UseSqlServer(builder.ConnectionString));
                 
             services.AddControllers();
             services.AddScoped<ICommandRepository, SqlCommandRepository>();
